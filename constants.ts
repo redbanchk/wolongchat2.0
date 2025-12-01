@@ -41,3 +41,5 @@ export const INITIAL_MESSAGE: Message = {
 };
 
 export const ZHUGE_IMAGE_URL = "https://picsum.photos/400/600?grayscale&blur=1"; // Placeholder, normally a real asset
+
+export const ARK_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';

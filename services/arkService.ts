@@ -1,4 +1,4 @@
-import { SYSTEM_INSTRUCTION } from '../constants';
+import { SYSTEM_INSTRUCTION, ARK_BASE_URL } from '../constants';
 import { Message, Sender } from '../types';
 
 const getEnv = (key: string) => (import.meta as any).env?.[key];
@@ -22,7 +22,7 @@ export const fetchZhugeResponse = async (history: Message[], newMessage: string)
 
     // 优先使用前端密钥直连 Ark（若存在）
     if (apiKey) {
-      const arkResp = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
+      const arkResp = await fetch(ARK_BASE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
