@@ -30,20 +30,31 @@ export default async function handler(req: Request): Promise<Response> {
       ].filter(Boolean)
     };
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
     const resp = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
-    const data = await resp.json();
+    let data: any = null;
+    try {
+      data = await resp.json();
+    } catch {
+      // attempt to read as text when body is not JSON
+      const text = await resp.text();
+      data = { raw: text };
+    }
     if (!resp.ok) {
-      return new Response(JSON.stringify({ error: 'Ark error', details: data }), {
+      return new Response(JSON.stringify({ error: 'Ark error', status: resp.status, details: data }), {
         status: resp.status,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
       });
     }
 
@@ -51,12 +62,13 @@ export default async function handler(req: Request): Promise<Response> {
       content: data?.choices?.[0]?.message?.content ?? ''
     }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
     });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: 'Server error', message: e?.message || String(e) }), {
+    const errMsg = e?.message || String(e);
+    return new Response(JSON.stringify({ error: 'Server error', message: errMsg, name: e?.name, stack: undefined }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
     });
   }
 }
