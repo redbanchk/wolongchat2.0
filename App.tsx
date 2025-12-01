@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { INITIAL_MESSAGE } from './constants';
 import { Message, Sender, PresetQuestion } from './types';
-import { fetchZhugeResponse } from './services/geminiService';
+import { fetchZhugeResponse } from './services/arkService';
 import CharacterDisplay from './components/CharacterDisplay';
 import ChatBubble from './components/ChatBubble';
 import PresetOptions from './components/PresetOptions';
