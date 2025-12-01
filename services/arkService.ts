@@ -8,6 +8,7 @@ export const fetchZhugeResponse = async (history: Message[], newMessage: string)
   const viteApiKey = getEnv('VITE_ARK_API_KEY');
   const viteModelId = getEnv('VITE_ARK_MODEL_ID');
   const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const timeoutMs = 30000;
 
   const messages = [
     { role: 'system', content: SYSTEM_INSTRUCTION },
@@ -16,7 +17,7 @@ export const fetchZhugeResponse = async (history: Message[], newMessage: string)
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     log('info', '请求开始', { mode: isLocal && viteApiKey ? 'local-direct' : 'server-proxy' });
 
     // 仅在本地开发且显式提供 VITE_ARK_API_KEY 时，允许直连 Ark 便于调试
@@ -64,7 +65,37 @@ export const fetchZhugeResponse = async (history: Message[], newMessage: string)
     log('info', '服务端代理成功');
     return content || '亮一时思虑未及，请主公恕罪，可否再问？';
   } catch (e) {
-    log('error', '请求异常', { error: String(e) });
+    const errStr = String(e);
+    log('error', '请求异常', { error: errStr });
+    if (errStr.includes('AbortError')) {
+      try {
+        const controller2 = new AbortController();
+        const timeout2 = setTimeout(() => controller2.abort(), timeoutMs + 15000);
+        const resp2 = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [
+            { role: 'system', content: SYSTEM_INSTRUCTION },
+            { role: 'user', content: newMessage }
+          ] }),
+          signal: controller2.signal
+        });
+        clearTimeout(timeout2);
+        if (!resp2.ok) {
+          let details2: any = undefined;
+          try { details2 = await resp2.json(); } catch {}
+          log('error', '重试失败', { status: resp2.status, details: details2 });
+          return '调用失败，请稍后再试。';
+        }
+        const data2 = await resp2.json();
+        const content2 = data2?.content;
+        log('info', '重试成功');
+        return content2 || '亮一时思虑未及，请主公恕罪，可否再问？';
+      } catch (e2) {
+        log('error', '重试异常', { error: String(e2) });
+        return '天机难测，亮需暂作推演，请主公稍后再问。';
+      }
+    }
     return '天机难测，亮需暂作推演，请主公稍后再问。';
   } finally {
     clearTimeout(timeout);
