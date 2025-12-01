@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>诸葛问策台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              serif: ['"Noto Serif SC"', 'serif'],
+              calligraphy: ['"Ma Shan Zheng"', 'cursive'],
+            },
+            colors: {
+              'sgs-dark': '#2b2623',   // Dark background
+              'sgs-wood': '#4a3c31',   // Wood elements
+              'sgs-paper': '#dfdcd1',  // Light paper
+              'sgs-gold': '#cba46b',   // Border gold
+              'sgs-red': '#8f1f1f',    // Cinnabar red
+              'sgs-green': '#2c4f45',  // Shu Kingdom Green accent
+            },
+            backgroundImage: {
+              'pattern-cloud': "url('https://www.transparenttextures.com/patterns/binding-dark.png')",
+              'pattern-paper': "url('https://www.transparenttextures.com/patterns/rice-paper-2.png')",
+            },
+            boxShadow: {
+              'card': '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+              'inner-glow': 'inset 0 0 20px rgba(0,0,0,0.5)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #2b2623;
+        font-family: "Noto Serif SC", serif;
+      }
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #2b2623; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #4a3c31; 
+        border: 1px solid #cba46b;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #cba46b; 
+      }
+      
+      .text-shadow-gold {
+        text-shadow: 1px 1px 0px #cba46b;
+      }
+      .text-shadow-black {
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-sgs-dark text-sgs-paper antialiased overflow-hidden h-screen w-screen flex flex-col">
+    <div id="root" class="h-full w-full"></div>
+  </body>
+</html>
