@@ -35,4 +35,4 @@ This contains everything you need to run your app locally.
 - Settings → Environment Variables：
   - Key: `ARK_API_KEY`，Value: `<你的 Ark API Key>`，Target: `Production/Preview/Development`
   - 可选 Key: `ARK_MODEL_ID`，Value: `<你的模型ID>`，Target: 同上
-- 保存后重新触发部署即可生效（推送到 `main` 会自动部署）
+- 保存后重新触发部署即可生效（推送到 `main` 会自动部署）。本仓库已连接 GitHub，任何推送都会触发部署。
