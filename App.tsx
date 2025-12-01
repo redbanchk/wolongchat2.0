@@ -132,6 +132,7 @@ const App: React.FC = () => {
         {/* Input Area */}
         <InputArea onSend={handleUserMessage} disabled={isLoading} />
       </div>
+
       
       {/* Mobile Character Avatar (Floating) */}
       <div className="lg:hidden absolute top-4 left-4 z-50 w-12 h-12 rounded-full border-2 border-sgs-gold bg-sgs-dark overflow-hidden shadow-lg">
