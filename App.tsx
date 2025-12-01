@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { INITIAL_MESSAGE } from './constants';
 import { Message, Sender, PresetQuestion } from './types';
 import { fetchZhugeResponse } from './services/arkService';
+import { subscribe, getLogs, clearLogs, LogEntry } from './services/logger';
 import CharacterDisplay from './components/CharacterDisplay';
 import ChatBubble from './components/ChatBubble';
 import PresetOptions from './components/PresetOptions';
@@ -20,6 +21,8 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [showPresets, setShowPresets] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
+  const [logs, setLogs] = useState<LogEntry[]>(getLogs());
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +38,11 @@ const App: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading, showPresets]);
+
+  useEffect(() => {
+    const unsub = subscribe((l) => setLogs(l));
+    return () => unsub();
+  }, []);
 
   const handleUserMessage = async (text: string) => {
     const userMsg: Message = {
@@ -93,6 +101,7 @@ const App: React.FC = () => {
                  {/* Right decorative symbol */}
                 <svg viewBox="0 0 100 100" className="fill-sgs-gold"><path d="M50 0 L100 50 L50 100 L0 50 Z" /></svg>
              </div>
+             <button className="ml-6 px-3 py-2 border border-sgs-gold text-sgs-gold rounded" onClick={() => setShowLogs(true)}>查看日志</button>
           </div>
         </header>
 
@@ -138,6 +147,33 @@ const App: React.FC = () => {
       <div className="lg:hidden absolute top-4 left-4 z-50 w-12 h-12 rounded-full border-2 border-sgs-gold bg-sgs-dark overflow-hidden shadow-lg">
          <img src="https://picsum.photos/seed/zhuge/100/100?grayscale" alt="Avatar" className="w-full h-full object-cover" />
       </div>
+
+      {showLogs && (
+        <div className="absolute inset-0 bg-black/70 z-50 flex items-center justify-center">
+          <div className="bg-[#2b2623] border border-sgs-gold rounded-lg w-11/12 max-w-3xl max-h-[70vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-sgs-gold">
+              <div className="text-sgs-gold font-serif">运行日志</div>
+              <div className="flex gap-2">
+                <button className="px-3 py-1 border border-sgs-gold text-sgs-gold rounded" onClick={() => clearLogs()}>清空日志</button>
+                <button className="px-3 py-1 border border-sgs-gold text-sgs-gold rounded" onClick={() => setShowLogs(false)}>关闭</button>
+              </div>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              {logs.length === 0 && (
+                <div className="text-sgs-gold/70">暂无日志</div>
+              )}
+              {logs.slice().reverse().map((item) => (
+                <div key={item.id} className="mb-3">
+                  <div className={"text-xs " + (item.level === 'error' ? 'text-red-400' : item.level === 'warn' ? 'text-yellow-400' : 'text-sgs-gold')}>{new Date(item.timestamp).toLocaleString()} [{item.level}] {item.message}</div>
+                  {item.data && (
+                    <pre className="text-xs text-white/80 bg-black/30 p-2 rounded mt-1 overflow-x-auto">{JSON.stringify(item.data)}</pre>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
